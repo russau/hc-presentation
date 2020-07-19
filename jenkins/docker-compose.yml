@@ -7,4 +7,5 @@ services:
       - 8081:8080
       - 50000:50000
     volumes:
+      - ~/.aws/jenkins_credentials:/var/jenkins_home/.aws/credentials
       - ./jenkins_home:/var/jenkins_home
