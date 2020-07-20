@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>DevOps, where do Terraform and Packer help</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="reveal.js/css/theme/black.css" id="theme">
+
+
+		<!-- For syntax highlighting -->
+        
+        <link rel="stylesheet" href="reveal.js/lib/css/zenburn.css ">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+            <div class="slides">
+
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Preamble
+
+My goals for this presentation
+
+- DevOps practices 
+  - Terraform for Infrastructure as Code 
+  - Packer for Configuration Management
+  - Jenkins for CI/CD
+- A working sample a bit beyond introductory level
+- Real world debugging tips
+- Target audience - currently building software, new to devops, new to Terraform and Packer
+
+---
+
+- The code
+  * https://github.com/russau/hc-presentation
+  * https://github.com/russau/hc-presentation-terraform
+  * https://github.com/russau/hc-presentation-packer
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Welcome - About Me
+
+- Russ Sayers [@russaus](https://twitter.com/russaus)
+- Software engineer 15 years, 5+ in tech education
+- .net, obj-c ios, python, and lots of cloud infra
+- [https://stackoverflow.com/users/109102/russau](https://stackoverflow.com/users/109102/russau)
+
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						### DevOps, where do Terraform and Packer help
+
+End to end example of CI-CD pipelines for Infrastructure and Configuration Management
+
+_Level check_: what is your familiarity with DevOps, Packer, Terraform?
+
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Development / Ops
+
+In your organization what roles and workflows and involved in getting a feature in front of users?
+
+![diagram](images/engineering-infrastructure.png)
+
+Note:
+
+This might be an example of how your team is currently working. Developers are responsible for writing new applications and new features. While an operations team is responsible for deployment, running the service and responding to events.
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## DevOps
+
+> "involvement of the IT function in each phase of a system’s design and development, heavy reliance on automation versus human effort, the application of engineering practices and tools to operations tasks"
+>
+
+<small>Site Reliability Engineering: How Google Runs Production Systems</small>
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Why Automate?
+
+> automation versus human effort
+
+- codification of knowledge
+- scale
+- reduce human error
+
+Note:
+
+You might be able to create a reasonable amount of infrastructure for your applications manually. Clicking around in a cloud console, remoting into servers to install software.  This becomes "tribal knowledge" which can be lost to human memory, staffing changes, or pass on through "oral tradition" as a team grows. We are working with a very real risk this knowledge could be lost.
+
+Your time can be more efficiently spent when you move manual tasks to automation.  Now a smaller team can support more applications. Reducing operation overheard also allows teams to operate independently and choose their own tools - where previously adding to the technology stack would have created a overload of burden on the operations teams.
+
+If we can replay a task - we can replay it in a variety of different environments.  I automate something once and now I can do this in dev, staging and production.  If I attempt the same task manually in 3 environments I'm increasing my chances of missing a step or causing an error.
+
+Resilient systems mean happier staff!
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Tools
+
+> engineering practices and tools
+
+ - *Git* - Source Control
+ - *Jenkins* - Continuous Delivery
+ - *Terraform* - Infrastructure as Code
+ - *Packer* - Image Creation, Configuration Management
+
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Terraform - Infrastructure as Code
+
+``` code
+resource "aws_vpc" "presentation-vpc" {
+    cidr_block = "10.0.0.0/16"
+    enable_dns_support = "true"
+    enable_dns_hostnames = "true"
+    
+    tags = {
+        Name = "presentation-vpc"
+    }
+}
+```
+
+Notes:
+
+Terraform gives us the ability to define resources from a lot of different providers into files.  Now that we have resources in code we can start treating it like code.  It can be source controlled and versioned.
+
+With our infrastructure in a git repository we can build CI/CD pipelines to monitor to updates and use Terraform to make those updates to environments.  We've now automated a lot of the configuration that was previously done in front of a user interfaces.  Security and governance teams are also interested the history and configuration of infrastructure - we now have this just as we have it for application source.
+					</script>
+				</section>
+				
+
+            </div>
+
+		</div>
+
+		<script src="reveal.js/lib/js/head.min.js"></script>
+		<script src="reveal.js/js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+                
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                    
+					{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+                    
+                    
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
