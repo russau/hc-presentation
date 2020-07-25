@@ -1,5 +1,5 @@
 # Your presentation title
-title: DevOps, where do Terraform and Packer help
+title: Terraform for Infrastructure as Code
 
 # The Reveal theme
 reveal_theme: black.css

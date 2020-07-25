@@ -1,4 +1,4 @@
-### DevOps, where do Terraform and Packer help
+### Terraform for Infrastructure as Code
 
 End to end example of CI-CD pipelines for Infrastructure and Configuration Management
 
