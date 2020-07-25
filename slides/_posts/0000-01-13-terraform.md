@@ -1,13 +1,16 @@
-## Terraform - Dependencies
+## Terraform 
+
+* Input Variables, Interpolation
+* Resource Dependencies
 
 ```
+var region {}
+
 resource "aws_iam_instance_profile" "decrypt_profile" {
   name = "decrypt_profile_${var.region}"
   role = aws_iam_role.cert_decrypt_role.name
 }
-```
 
-```
 resource "aws_instance" "web1" {
   ami                    = data.aws_ami.nginx-demo.id
   instance_type          = "t2.micro"
