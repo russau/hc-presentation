@@ -2,4 +2,4 @@
 
  * What's next
    * https://registry.terraform.io/
-   * Terraform modules
+   * Terraform modules and workspaces

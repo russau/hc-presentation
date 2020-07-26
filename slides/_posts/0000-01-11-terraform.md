@@ -2,5 +2,6 @@
 
 * Mapping config to the real world
 * Store metadata
-* Remote state for teams
-* ⚠️ Encryption for Secrets
+* State backends
+  * s3, remote, consul, gcs, pg 
+  * ⚠️ Encryption for secrets

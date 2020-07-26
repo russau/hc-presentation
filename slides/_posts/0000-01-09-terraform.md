@@ -1,5 +1,7 @@
 ## Terraform - Resources
 
+infrastructure object type that is managed via a remote network API
+
 ```
 provider "aws" {
   region = "us-east-1"
