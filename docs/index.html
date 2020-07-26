@@ -48,8 +48,7 @@ My goals for this presentation
   - Terraform for Infrastructure as Code 
   - Jenkins for CI/CD
 - A working sample a bit beyond introductory level
-- How to approach a new terraform project
-- Target audience - currently building software, new to devops, new to Terraform and Packer
+- Target audience - currently building software, new to DevOps, new to Terraform and Packer
 
 ---
 
@@ -149,16 +148,18 @@ Resilient systems mean happier staff!
 					<script type="text/template">
 						## Terraform 
 
-Use Infrastructure as Code to provision and manage any cloud, infrastructure, or service
+* Use Infrastructure as Code to provision and manage any cloud, infrastructure, or service. 
+
+* Declarative language.
 
 * Providers
   * *Cloud*: AWS, Azure, GCP, Alibaba, ...
   * *Infrastructure*: Chef, Consul, Docker, K8, Nomad, Vault, ...
-  * *Network*: Akamai, Check Point, Cloudflare, DNS, HTTP
-  * *Database*: InfluxDB, MySQL, PostgreSQL
+  * *Network*: Akamai, Check Point, Cloudflare, DNS, HTTP, ...
 
+Notes:
 
-  
+A provider is a plugs that makes available *resources* and *data sources*.  For example the AWS provider has an `aws_instance` resource and a `aws_ami` data source.
 					</script>
 				</section>
 				
@@ -166,7 +167,13 @@ Use Infrastructure as Code to provision and manage any cloud, infrastructure, or
 					<script type="text/template">
 						## Terraform - Resources
 
+infrastructure object type that is managed via a remote network API
+
 ```
+provider "aws" {
+  region = "us-east-1"
+}
+
 resource "aws_vpc" "presentation-vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_support   = "true"
@@ -191,23 +198,9 @@ With our infrastructure in a git repository we can build CI/CD pipelines to moni
 						## Terraform - Workflow
 
 ``` bash
-$ terraform init
-$ terraform plan
-$ terraform apply
-```
-					</script>
-				</section>
-				
-				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
-					<script type="text/template">
-						## Terraform - Data Sources
-
-```
-data "github_release" "terraform" {
-  repository  = "terraform"
-  owner       = "hashicorp"
-  retrieve_by = "latest"
-}
+$ terraform init  # Initialize working directory
+$ terraform plan  # Generate execution plan 
+$ terraform apply # Builds / changes infrastructure
 ```
 					</script>
 				</section>
@@ -218,26 +211,70 @@ data "github_release" "terraform" {
 
 * Mapping config to the real world
 * Store metadata
-* Remote state for teams
- * `terraform_remote_state`
-* ⚠️ Encryption for Secrets
-
+* State backends
+  * s3, remote, consul, gcs, pg 
+  * ⚠️ Encryption for secrets
 
 					</script>
 				</section>
 				
 				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
 					<script type="text/template">
-						## Terraform - Dependencies
+						## Demo - Start Simple
 
 ```
-resource "aws_iam_instance_profile" "decrypt_profile" {
-  name = "decrypt_profile_${var.region}"
-  role = aws_iam_role.cert_decrypt_role.name
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
+}
+
+# Create a container
+resource "docker_container" "one" {
+  image   = docker_image.ubuntu.latest
+  name    = "mr_ubuntu"
+  command = ["/bin/sleep", "infinity"]
+}
+
+resource "docker_image" "ubuntu" {
+  name = "ubuntu:20.04"
 }
 ```
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Terraform - Data Sources
 
 ```
+data "aws_ami" "nginx-demo" {
+  most_recent = true
+  owners      = ["self"]
+
+  filter {
+    name   = "name"
+    values = ["nginx-demo-*"]
+  }
+}
+```
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Terraform 
+
+* Input Variables, Interpolation
+* Resource Dependencies
+
+```
+variable region {}
+
+resource "aws_iam_instance_profile" "decrypt_profile" {
+  name = "decrypt_profile_${var.region}"
+  # first class expression
+  role = aws_iam_role.cert_decrypt_role.name
+}
+
 resource "aws_instance" "web1" {
   ami                    = data.aws_ami.nginx-demo.id
   instance_type          = "t2.micro"
@@ -246,6 +283,52 @@ resource "aws_instance" "web1" {
   vpc_security_group_ids = [aws_security_group.web-open.id]
 }
 ```
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Terraform 
+
+* Output values
+* View with `terraform output`
+* Teams share outputs via `terraform_remote_state` data source
+
+```
+output "web_certificate_pem" {
+  value = acme_certificate.certificate.certificate_pem
+}
+```
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Demo - CI-CD for Infrastructure
+
+* Two pipelines
+  * *Packer* - automation of machine images
+  * *Terraform* - automation of infrastructure
+  
+* Goals
+  * Machine image automated testing
+  * Encryption of SSL secret keys
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						![infra](images/infrastructure.png)
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
+						## Conclusion / Questions
+
+ * What's next
+   * https://registry.terraform.io/
+   * Terraform modules and workspaces
 					</script>
 				</section>
 				

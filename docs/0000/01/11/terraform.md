@@ -1,9 +1,7 @@
-## Terraform - Data Sources
+## Terraform - State
 
-```
-data "github_release" "terraform" {
-  repository  = "terraform"
-  owner       = "hashicorp"
-  retrieve_by = "latest"
-}
-```
+* Mapping config to the real world
+* Store metadata
+* State backends
+  * s3, remote, consul, gcs, pg 
+  * ⚠️ Encryption for secrets
