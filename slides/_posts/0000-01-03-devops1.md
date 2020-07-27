@@ -1,5 +1,5 @@
 ### Terraform for Infrastructure as Code
 
-End to end example of CI-CD pipelines for Infrastructure and Configuration Management
+Getting you started with Terraform
 
-_Level check_: what is your familiarity with DevOps, Packer, Terraform?
+_Level check_: what is your familiarity with DevOps, and Terraform?

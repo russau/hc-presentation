@@ -1,6 +1,6 @@
 ## Terraform - Resources
 
-infrastructure object type that is managed via a remote network API
+infrastructure object type that is (usually) managed via a remote network API
 
 ```
 provider "aws" {
