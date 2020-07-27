@@ -45,9 +45,8 @@
 My goals for this presentation
 
 - DevOps practices 
-  - Terraform for Infrastructure as Code 
-  - Jenkins for CI/CD
-- A working sample a bit beyond introductory level
+- Terraform for Infrastructure as Code 
+- Jenkins for CI/CD  (if there is time)
 - Target audience - currently building software, new to DevOps, new to Terraform and Packer
 
 ---
@@ -76,9 +75,9 @@ My goals for this presentation
 					<script type="text/template">
 						### Terraform for Infrastructure as Code
 
-End to end example of CI-CD pipelines for Infrastructure and Configuration Management
+Getting you started with Terraform
 
-_Level check_: what is your familiarity with DevOps, Packer, Terraform?
+_Level check_: what is your familiarity with DevOps, and Terraform?
 
 					</script>
 				</section>
@@ -89,7 +88,7 @@ _Level check_: what is your familiarity with DevOps, Packer, Terraform?
 
 In your organization what roles and workflows and involved in getting a feature in front of users?
 
-![diagram](images/engineering-infrastructure.png)
+<img src="images/engineering-infrastructure.jpg" width="600"/>
 
 Note:
 
@@ -152,14 +151,14 @@ Resilient systems mean happier staff!
 
 * Declarative language.
 
-* Providers
+* Providers <a href="https://registry.terraform.io/" target="_blank">https://registry.terraform.io/</a>
   * *Cloud*: AWS, Azure, GCP, Alibaba, ...
   * *Infrastructure*: Chef, Consul, Docker, K8, Nomad, Vault, ...
   * *Network*: Akamai, Check Point, Cloudflare, DNS, HTTP, ...
 
 Notes:
 
-A provider is a plugs that makes available *resources* and *data sources*.  For example the AWS provider has an `aws_instance` resource and a `aws_ami` data source.
+A provider is a plug in that makes available *resources* and *data sources*.  For example the AWS provider has an `aws_instance` resource and a `aws_ami` data source.
 					</script>
 				</section>
 				
@@ -167,7 +166,7 @@ A provider is a plugs that makes available *resources* and *data sources*.  For 
 					<script type="text/template">
 						## Terraform - Resources
 
-infrastructure object type that is managed via a remote network API
+infrastructure object type that is (usually) managed via a remote network API
 
 ```
 provider "aws" {
@@ -267,18 +266,18 @@ data "aws_ami" "nginx-demo" {
 * Resource Dependencies
 
 ```
-variable region {}
+variable "region" {
+  default = "ap-southeast-2"
+}
 
 resource "aws_iam_instance_profile" "decrypt_profile" {
   name = "decrypt_profile_${var.region}"
-  # first class expression
   role = aws_iam_role.cert_decrypt_role.name
 }
 
 resource "aws_instance" "web1" {
   ami                    = data.aws_ami.nginx-demo.id
   instance_type          = "t2.micro"
-  iam_instance_profile   = aws_iam_instance_profile.decrypt_profile.name
   subnet_id              = aws_subnet.presentation-subnet-public-1.id
   vpc_security_group_ids = [aws_security_group.web-open.id]
 }
@@ -313,6 +312,7 @@ output "web_certificate_pem" {
 * Goals
   * Machine image automated testing
   * Encryption of SSL secret keys
+
 					</script>
 				</section>
 				
@@ -324,11 +324,21 @@ output "web_certificate_pem" {
 				
 				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
 					<script type="text/template">
+						![jenkins](images/jenkins.png)
+
+					</script>
+				</section>
+				
+				<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$" data-notes="^Note:">
+					<script type="text/template">
 						## Conclusion / Questions
 
- * What's next
-   * https://registry.terraform.io/
-   * Terraform modules and workspaces
+* What's next
+  * Terraform modules and workspaces
+  * `terraform import` for existing resources
+  * Resource `count` and `for_each`
+* Consul on Raspberry Pi
+  * https://youtu.be/jfrr5x6-Nrk
 					</script>
 				</section>
 				

@@ -2,7 +2,7 @@
 
 In your organization what roles and workflows and involved in getting a feature in front of users?
 
-![diagram](images/engineering-infrastructure.png)
+<img src="images/engineering-infrastructure.jpg" width="600"/>
 
 Note:
 
